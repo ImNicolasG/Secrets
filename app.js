@@ -12,7 +12,24 @@ app.use(bodyParser.urlencoded({extended:true}));
 app.use(express.static("public"));
 
 
-// mongoose.connect("mongodb://localhost:27017/secretsLogin", {useNewUrlParser:true});
+
+
+
+mongoose.connect("mongodb://localhost:27017/userDB", {useNewUrlParser:true});
+
+const userSchema = new mongoose.Schema ({
+    email: String,
+    password: String
+});
+
+const User = new mongoose.model("User", userSchema);
+
+
+
+
+
+
+
 
 
 app.get("/", function(req, res) {
@@ -20,9 +37,16 @@ app.get("/", function(req, res) {
 });
 
 
+
+
+
+
 app.get("/login", function(req, res) {
     res.render("login");
 });
+
+
+
 
 
 app.get("/register", function(req, res) {
@@ -30,12 +54,22 @@ app.get("/register", function(req, res) {
 });
 
 
-app.get("/secrets", function(req, res) {
-    res.render("secrets");
+
+
+app.post("/register", function(req, res) {
+    const newUser = new User({
+        email: req.body.username,
+        password: req.body.password
+    });
+
+    newUser.save(function(err) {
+        if (!err) {
+            res.render("secrets");
+        } else {
+            console.log(err);
+        }
+    });
 });
-
-
-
 
 
 
