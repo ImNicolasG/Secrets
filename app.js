@@ -3,6 +3,7 @@ const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const ejs = require("ejs");
 const express = require("express");
+const encrype = require("mongoose-encryption");
 
 const app = express();
 
@@ -21,6 +22,12 @@ const userSchema = new mongoose.Schema ({
     email: String,
     password: String
 });
+
+const secret = "Thisisourlittlesecret.";
+
+// this plugin for encryption must be added before creating a model using the mentioned schema
+userSchema.plugin(encrypt, { secret: secret});
+
 
 const User = new mongoose.model("User", userSchema);
 
