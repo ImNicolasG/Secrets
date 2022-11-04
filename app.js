@@ -115,13 +115,13 @@ passport.use(new FacebookStrategy({
 
 
 
-
+// Render home page at root route
 app.get("/", function(req, res) {
     res.render("home");
 });
 
 
-
+// Google login authentication
 app.get("/auth/google", passport.authenticate("google", { scope: ["profile"] }));
 
 app.get("/auth/google/secrets", 
@@ -132,6 +132,7 @@ app.get("/auth/google/secrets",
 });
 
 
+// Facebook Login authentication
 app.get("/auth/facebook", passport.authenticate("facebook"));
 
 app.get("/auth/facebook/secrets",
@@ -142,31 +143,34 @@ app.get("/auth/facebook/secrets",
 });
 
 
-
+// render login page
 app.get("/login", function(req, res) {
     res.render("login");
 });
 
-
+// render register page
 app.get("/register", function(req, res) {
     res.render("register");
 });
 
 
-
+// render secrets page if user is authenticated
 app.get("/secrets", function(req, res) {
     if (req.isAuthenticated()) {
+        // Find all "Secret's" in the DB and display them as called in the secrets page through ejs
         Secret.find({}, function(err, secrets) {
             res.render("secrets", {
                 Secrets: secrets
             });
         });
+        // if they are not authenticated, redirect to login page
     } else {
         res.redirect("/login");
     };
 });
 
 
+// Log out our user
 app.get("/logout", function(req, res) {
     req.logout(function(err) {
         if (err) {
@@ -178,6 +182,7 @@ app.get("/logout", function(req, res) {
 });
 
 
+// if the user is authenticated, allow them to submit a secret
 app.get("/submit", function(req, res) {
     if (req.isAuthenticated()) {
         res.render("submit");
@@ -189,9 +194,10 @@ app.get("/submit", function(req, res) {
 
 
 
-
+// allow a user to register using an email and password, saving them to a database
 app.post("/register", function(req, res) {
-
+    // If there is an error while registering, redirect to the register page
+    //Otherwise authenticate them and display the secrets page
     User.register({username: req.body.username}, req.body.password, function(err, user) {
         if (err) {
             console.log(err);
@@ -231,12 +237,12 @@ app.post("/login", passport.authenticate("local"), function(req, res) {
 
 
 
-
+// Submits a new secret to the database and saves it if there is no err
 app.post("/submit", function(req, res) {
     const secret = new Secret({
         secret: req.body.secret
     });
-    
+
     secret.save(function(err) {
         if (!err) {
             res.redirect("/secrets")
